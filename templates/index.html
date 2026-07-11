@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M3U8 HLS Video Downloader GUI</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Local CSS Styles -->
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="glass-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-glow"></div>
+                <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <h1>Antigravity Downloader</h1>
+            </div>
+            <p class="subtitle">Tải xuống video M3U8 chất lượng cao với tốc độ cực nhanh</p>
+        </header>
+
+        <!-- Downloader Form -->
+        <main class="downloader-main">
+            <section class="config-card">
+                <div class="card-header">
+                    <h2>Cấu hình tải xuống</h2>
+                </div>
+                <form id="downloadForm" onsubmit="event.preventDefault();">
+                    <div class="input-group">
+                        <label for="m3u8Url">Đường dẫn M3U8 URL</label>
+                        <div class="input-wrapper">
+                            <input type="url" id="m3u8Url" name="url" required placeholder="https://example.com/path/index.m3u8" autocomplete="off">
+                            <span class="focus-border"></span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="outputPath">Đường dẫn xuất file video (.ts)</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="outputPath" name="outputPath" required placeholder="C:\Users\gd\Downloads\video.ts" autocomplete="off">
+                            <span class="focus-border"></span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" id="startBtn" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                                <polyline points="8 3 12 7 16 3"/>
+                                <path d="M12 7v14"/>
+                            </svg>
+                            <span>Bắt đầu tải</span>
+                        </button>
+                        <button type="button" id="cancelBtn" class="btn btn-danger" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            </svg>
+                            <span>Hủy tải</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Progress Monitor -->
+            <section id="progressSection" class="progress-card hidden">
+                <div class="card-header">
+                    <h2>Trạng thái tải xuống</h2>
+                    <span id="statusBadge" class="badge">Sẵn sàng</span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Đã tải</span>
+                        <span id="segmentsCount" class="stat-value">0 / 0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Tốc độ</span>
+                        <span id="downloadSpeed" class="stat-value">0.0 seg/s</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Thời gian còn lại</span>
+                        <span id="timeRemaining" class="stat-value">--:--</span>
+                    </div>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar-glow"></div>
+                    <div class="progress-bar-wrapper">
+                        <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <span id="progressPercent" class="progress-percent">0%</span>
+                </div>
+            </section>
+
+            <!-- Console Log -->
+            <section class="console-card">
+                <div class="card-header">
+                    <h2>Nhật ký tiến trình (Console Logs)</h2>
+                    <button id="clearLogsBtn" class="btn btn-text">Xóa log</button>
+                </div>
+                <div id="consoleOutput" class="console-output">
+                    <div class="console-line system-msg">[Hệ thống] Sẵn sàng nhận nhiệm vụ...</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Phát triển bởi Antigravity AI Studio &copy; 2026</p>
+        </footer>
+    </div>
+
+    <!-- JS Logic -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
