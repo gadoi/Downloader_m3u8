@@ -9,6 +9,11 @@ import concurrent.futures
 import time
 import shutil
 import threading
+import ssl
+
+# Create SSL context to bypass certificate verification for sites with SSL issues
+ssl_context = ssl._create_unverified_context()
+
 
 PORT = 12345
 SCRATCH_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,7 +48,7 @@ def add_log(message):
 def parse_m3u8(playlist_url):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
     req = urllib.request.Request(playlist_url, headers=headers)
-    with urllib.request.urlopen(req) as response:
+    with urllib.request.urlopen(req, context=ssl_context) as response:
         content = response.read().decode('utf-8')
     
     parsed_playlist = urllib.parse.urlparse(playlist_url)
@@ -89,7 +94,7 @@ def download_segment(args):
             
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=12) as response:
+            with urllib.request.urlopen(req, timeout=12, context=ssl_context) as response:
                 data = response.read()
                 with open(temp_path, "wb") as f:
                     f.write(data)

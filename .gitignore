@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local temp directories
+temp_segments/
+
+# OS files
+.DS_Store
+Thumbs.db
