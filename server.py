@@ -94,7 +94,7 @@ def download_segment(args):
             
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=12, context=ssl_context) as response:
+            with urllib.request.urlopen(req, timeout=25, context=ssl_context) as response:
                 data = response.read()
                 with open(temp_path, "wb") as f:
                     f.write(data)
@@ -103,7 +103,8 @@ def download_segment(args):
             if attempt == max_retries:
                 add_log(f"Lỗi tải đoạn {index}: {e}")
                 return temp_path, False
-            time.sleep(0.5)
+            # Backoff retry delay
+            time.sleep(attempt * 2)
             
     return temp_path, False
 
@@ -156,7 +157,7 @@ def run_download_thread(url, output_file):
     failed_indices = []
     start_time = time.time()
     
-    max_workers = 20
+    max_workers = 8
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         active_executor = executor
