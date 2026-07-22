@@ -5,6 +5,7 @@ import http.server
 import socketserver
 import urllib.request
 import urllib.parse
+import urllib.error
 import concurrent.futures
 import time
 import shutil
@@ -86,7 +87,7 @@ def download_segment(args):
         return temp_path, True
         
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-    max_retries = 5
+    max_retries = 8
     
     for attempt in range(1, max_retries + 1):
         if cancel_flag.is_set():
@@ -94,11 +95,20 @@ def download_segment(args):
             
         try:
             req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=25, context=ssl_context) as response:
+            with urllib.request.urlopen(req, timeout=30, context=ssl_context) as response:
                 data = response.read()
                 with open(temp_path, "wb") as f:
                     f.write(data)
             return temp_path, True
+        except urllib.error.HTTPError as e:
+            if attempt == max_retries:
+                add_log(f"Lỗi tải đoạn {index} (HTTP {e.code}): {e.reason}")
+                return temp_path, False
+            if e.code in [429, 503, 504]:
+                # Server too busy or rate limited, back off longer
+                time.sleep(attempt * 4)
+            else:
+                time.sleep(attempt * 2)
         except Exception as e:
             if attempt == max_retries:
                 add_log(f"Lỗi tải đoạn {index}: {e}")
@@ -157,7 +167,7 @@ def run_download_thread(url, output_file):
     failed_indices = []
     start_time = time.time()
     
-    max_workers = 8
+    max_workers = 4
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         active_executor = executor
@@ -205,7 +215,7 @@ def run_download_thread(url, output_file):
         retry_args = [download_args[i] for i in failed_indices]
         failed_indices = []
         
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             futures = {executor.submit(download_segment, arg): arg for arg in retry_args}
             for future in concurrent.futures.as_completed(futures):
                 if cancel_flag.is_set():
